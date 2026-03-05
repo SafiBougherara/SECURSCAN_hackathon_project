@@ -13,7 +13,7 @@ class NpmAuditService
 
         $process = new Process(['npm', 'audit', '--json']);
         $process->setWorkingDirectory($path);
-        $process->setTimeout(90);
+        $process->setTimeout(300);
         $process->run();
 
         $output = json_decode($process->getOutput(), true);

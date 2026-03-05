@@ -34,7 +34,7 @@ class BanditService
         ];
         $process->setEnv($env);
 
-        $process->setTimeout(90);
+        $process->setTimeout(300);
         $process->run();
 
         $output = json_decode($process->getOutput(), true);

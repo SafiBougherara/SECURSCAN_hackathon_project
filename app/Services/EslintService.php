@@ -12,7 +12,7 @@ class EslintService
             return [];
 
         $process = new Process(['npx', 'eslint', '--format', 'json', $path]);
-        $process->setTimeout(90);
+        $process->setTimeout(300);
         $process->run();
 
         $output = json_decode($process->getOutput(), true);
