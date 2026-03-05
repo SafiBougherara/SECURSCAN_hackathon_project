@@ -2,7 +2,7 @@
 require 'vendor/autoload.php';
 use Symfony\Component\Process\Process;
 
-file_put_contents('test_secrets.txt', "AWS_KEY=AKIAQYLPMN5HHHFPZAM2\nAWS_SECRET=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\n");
+file_put_contents('test_secrets.txt', "AWS_KEY=\nAWS_SECRET=\n");
 
 $binary = 'c:\laragon\www\Projet_hackathon\trufflehog.exe';
 $path = __DIR__ . '/test_secrets.txt';
