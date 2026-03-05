@@ -1,0 +1,68 @@
+@startuml class_diagram
+
+package "App\Models" {
+    class User {
+        +id: int
+        +name: string
+        +email: string
+    }
+    class Scan {
+        +id: int
+        +repo_url: string
+        +repo_name: string
+        +status: string
+        +score: int
+    }
+    class Vulnerability {
+        +id: int
+        +scan_id: int
+        +tool: string
+        +severity: string
+        +message: string
+        +file_path: string
+        +line_start: int
+        +owasp_category: string
+        +ai_fix: text
+        +chat_explanation: text
+    }
+}
+
+package "App\Services" {
+    class AiFixService {
+        +generateFix(Vulnerability)
+        +generateFixesForMany(array)
+    }
+    class AiChatService {
+        +sendMessage(string, array, int)
+    }
+    class OwaspMapperService {
+        +map(array): array
+    }
+    class GitHubPRService {
+        +createPullRequestViaApi(Scan, array)
+    }
+    class GitCloneService {
+        +clone(string): string
+    }
+}
+
+package "App\Http\Controllers" {
+    class ScanController {
+        +dashboard(Scan)
+        +store(Request)
+    }
+    class VulnerabilityController {
+        +fix(Vulnerability)
+        +saveFix(Request, Vulnerability)
+    }
+}
+
+Scan "1" -- "*" Vulnerability : contains
+User "1" -- "*" Scan : owns
+ScanController ..> GitCloneService : uses
+ScanController ..> OwaspMapperService : uses
+VulnerabilityController ..> AiFixService : uses
+AiFixService ..> OwaspMapperService : uses
+GitHubPRService ..> Scan : references
+
+@enduml

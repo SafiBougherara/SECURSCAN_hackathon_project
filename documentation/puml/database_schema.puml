@@ -1,0 +1,88 @@
+@startuml database_schema
+
+!define table(x) class x << (T,#FFAAAA) >>
+!define primary_key(x) <b><u>x</u></b>
+!define foreign_key(x) <i>x</i>
+
+table(users) {
+    primary_key(id) : BIGINT
+    name : VARCHAR
+    email : VARCHAR
+    password : VARCHAR
+    created_at : TIMESTAMP
+}
+
+table(scans) {
+    primary_key(id) : BIGINT
+    foreign_key(user_id) : BIGINT
+    repo_url : VARCHAR
+    repo_name : VARCHAR
+    status : ENUM('pending', 'processing', 'done', 'failed')
+    score : INTEGER
+    error_message : TEXT
+    created_at : TIMESTAMP
+}
+
+table(vulnerabilities) {
+    primary_key(id) : BIGINT
+    foreign_key(scan_id) : BIGINT
+    tool : VARCHAR
+    severity : VARCHAR
+    message : TEXT
+    file_path : VARCHAR
+    line_start : INTEGER
+    code_snippet : TEXT
+    owasp_category : VARCHAR
+    owasp_label : VARCHAR
+    ai_fix : TEXT
+    chat_explanation : TEXT
+    created_at : TIMESTAMP
+}
+
+package "Laravel System Tables" <<Rectangle>> {
+    table(jobs) {
+        primary_key(id) : BIGINT
+        queue : VARCHAR
+        payload : LONGTEXT
+        attempts : TINYINT
+        reserved_at : INTEGER
+        available_at : INTEGER
+        created_at : INTEGER
+    }
+
+    table(failed_jobs) {
+        primary_key(id) : BIGINT
+        uuid : VARCHAR
+        connection : TEXT
+        queue : TEXT
+        payload : LONGTEXT
+        exception : LONGTEXT
+        failed_at : TIMESTAMP
+    }
+
+    table(cache) {
+        key : VARCHAR
+        value : MEDIUMTEXT
+        expiration : INTEGER
+    }
+
+    table(sessions) {
+        id : VARCHAR
+        user_id : BIGINT
+        ip_address : VARCHAR
+        user_agent : TEXT
+        payload : LONGTEXT
+        last_activity : INTEGER
+    }
+}
+
+users "1" -- "0..*" scans : creates
+scans "1" -- "0..*" vulnerabilities : contains
+
+note bottom of scans : Stocke l'en-tête du scan et le score global.
+note bottom of vulnerabilities : Détail de chaque faille trouvée avec son aide IA.
+note bottom of jobs : Gère la file d'attente des scans asynchrones.
+note bottom of cache : Stocke les résultats temporaires et les verrous.
+note bottom of sessions : Gère la persistance de la connexion utilisateur.
+
+@enduml
