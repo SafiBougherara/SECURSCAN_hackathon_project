@@ -1,0 +1,35 @@
+@startuml sequence_ai_fix_flow
+
+actor Utilisateur
+participant "Dashboard (Alpine.js)" as UI
+participant "VulnerabilityController" as CTRL
+participant "AiFixService" as FIXER
+participant "AiChatService" as CHAT
+participant "Gemini API" as AI
+participant "GitHub PR Service" as GH
+database Database
+
+Utilisateur -> UI : Clic "🔍 Detail"
+UI -> CTRL : GET /vulnerability/{id}/fix
+CTRL -> FIXER : generateFix(vuln)
+FIXER -> AI : Prompt (Context + Code)
+AI -> FIXER : Reponse (Code Corrigé)
+FIXER -> Database : Cache fix
+CTRL -> UI : Reponse JSON (fix + details)
+UI -> Utilisateur : Affiche le Diff côte-à-côte
+
+Utilisateur -> UI : Modifie le code (Textarea)
+Utilisateur -> UI : Clic "💾 Enregistrer"
+UI -> CTRL : POST /save-fix
+CTRL -> Database : Update vuln.ai_fix
+CTRL -> UI : success: true
+
+Utilisateur -> UI : Clic "Créer Pull Request"
+UI -> GH : createPullRequest(Scan, selection)
+GH -> AI : Requête Résumé/Readme (optionnel)
+GH -> GH : Appliquer patches localement
+GH -> GH : Git Commit & Push
+GH -> UI : Reponse (pr_url)
+UI -> Utilisateur : Affiche lien vers GitHub
+
+@enduml

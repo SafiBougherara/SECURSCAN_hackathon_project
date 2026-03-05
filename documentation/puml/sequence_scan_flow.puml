@@ -1,0 +1,38 @@
+@startuml sequence_scan_flow
+
+actor Utilisateur
+participant "Web Interface" as UI
+participant "ScanController" as CTRL
+participant "RunSecurityScanJob" as JOB
+participant "GitCloneService" as GIT
+participant "Security Tool (Semgrep/Bandit...)" as TOOLS
+participant "OwaspMapperService" as MAPPER
+database Database
+
+Utilisateur -> UI : Saisit URL GitHub
+UI -> CTRL : POST /scan
+CTRL -> Database : Créer Scan (status: pending)
+CTRL -> JOB : Dispatch(ScanID)
+CTRL -> UI : Redirect /loading
+UI -> Utilisateur : Affiche "Analyse en cours..."
+
+group Background Task (Queue Worker)
+    JOB -> GIT : clone(url)
+    GIT -> JOB : path_local
+    JOB -> TOOLS : run(path_local)
+    TOOLS -> JOB : raw_results (JSON)
+    loop chaque vulnérabilité
+        JOB -> MAPPER : map(raw_vuln)
+        MAPPER -> JOB : vuln_data (with OWASP 2025)
+        JOB -> Database : Save Vulnerability
+    end
+    JOB -> Database : Update Scan (status: done, score: X)
+end
+
+Utilisateur -> UI : Polling status
+UI -> CTRL : GET /status
+CTRL -> UI : {status: done}
+UI -> UI : Redirect /dashboard
+UI -> Utilisateur : Affiche les résultats
+
+@enduml
