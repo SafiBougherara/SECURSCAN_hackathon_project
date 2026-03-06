@@ -2,7 +2,30 @@
 require 'vendor/autoload.php';
 use Symfony\Component\Process\Process;
 
-file_put_contents('test_secrets.txt', "AWS_KEY=AKIAQYLPMN5HHHFPZAM2\nAWS_SECRET=1tUm636uS1yOEcfP5pvfqJ/ml36mF7AkyHsEU0IU\n");
+// Function to generate a fake AWS Access Key ID (AKIA...)
+function generateFakeAwsAccessKeyId() {
+    $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    $key = 'AKIA'; // AWS Access Key IDs start with AKIA
+    for ($i = 0; $i < 16; $i++) {
+        $key .= $chars[random_int(0, strlen($chars) - 1)];
+    }
+    return $key;
+}
+
+// Function to generate a fake AWS Secret Access Key (40 base64 characters)
+function generateFakeAwsSecretAccessKey() {
+    $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+    $key = '';
+    for ($i = 0; $i < 40; $i++) {
+        $key .= $chars[random_int(0, strlen($chars) - 1)];
+    }
+    return $key;
+}
+
+$awsKey = generateFakeAwsAccessKeyId();
+$awsSecret = generateFakeAwsSecretAccessKey();
+
+file_put_contents('test_secrets.txt', "AWS_KEY=$awsKey\nAWS_SECRET=$awsSecret\n");
 
 $binary = 'c:\laragon\www\Projet_hackathon\trufflehog.exe';
 $path = __DIR__ . '/test_secrets.txt';
