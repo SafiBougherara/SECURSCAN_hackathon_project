@@ -1,14 +1,18 @@
 # 🔒 SecureScan Security Report
 
 **Scanned:** `https://github.com/SafiBougherara/SECURSCAN_hackathon_project`  
-**Date:** 2026-03-05 15:39
+**Date:** 2026-03-13 21:28
 
-## CRITICAL (1)
-- **[A08:2025]** Secret detected: AWS — `tests\Scripts\test_truffle_logic.php`:5
+## HIGH (1)
+- **[A06:2025]** Vulnerable dependency: flatted — no title — `package.json`
 
   **AI Fix:**
   ```
-  file_put_contents('test_secrets.txt', "AWS_KEY=" . env('AWS_KEY') . "\nAWS_SECRET=" . env('AWS_SECRET')
+  {
+    "dependencies": {
+      "flatted": "^3.4.0"
+    }
+  }
   ```
 
 ---
